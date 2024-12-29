@@ -43,9 +43,9 @@ func TestAsyncPostWebAction(t *testing.T) {
 		},
 		{
 			name:           "Error in request creation",
-			url:            "://invalid-url",
+			url:            "1231",
 			body:           []byte(`{"key": "value"}`),
-			expectedErrMsg: "parse \"://invalid-url\": missing protocol scheme",
+			expectedErrMsg: "connect: no route to host",
 		},
 		{
 			name: "Non-200 status code",
@@ -54,7 +54,7 @@ func TestAsyncPostWebAction(t *testing.T) {
 			handler: func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusInternalServerError)
 			},
-			expectedErrMsg: "Error invoking action: 500 Internal Server Error",
+			expectedErrMsg: "Not OK (500 Internal Server Error)",
 		},
 	}
 

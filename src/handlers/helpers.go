@@ -61,3 +61,26 @@ func extractAuthToken(r *http.Request) (string, error) {
 	apiKey = strings.TrimPrefix(apiKey, "Bearer ")
 	return apiKey, nil
 }
+
+func ensureProtocolScheme(url string) string {
+	if url == "" {
+		return url
+	}
+	if strings.HasPrefix(url, "http://") {
+		return url
+	}
+	if strings.HasPrefix(url, "https://") {
+		return url
+	}
+	return "https://" + url
+}
+
+func ensurePackagePresent(actionToInvoke string) string {
+	if actionToInvoke == "" {
+		return ""
+	}
+	if !strings.Contains(actionToInvoke, "/") {
+		actionToInvoke = "default" + "/" + actionToInvoke
+	}
+	return actionToInvoke
+}

@@ -105,17 +105,10 @@ func WebActionStreamHandler(streamingProxyAddr string, apihost string) func(http
 	}
 }
 
-func ensurePackagePresent(actionToInvoke string) string {
-	if !strings.Contains(actionToInvoke, "/") {
-		actionToInvoke = "default" + "/" + actionToInvoke
-	}
-	return actionToInvoke
-}
-
 func asyncPostWebAction(errChan chan error, url string, body []byte) {
 	bodyReader := strings.NewReader(string(body))
 
-	req, err := http.NewRequest("POST", url, bodyReader)
+	req, err := http.NewRequest("POST", ensureProtocolScheme(url), bodyReader)
 	if err != nil {
 		errChan <- err
 		return
@@ -132,7 +125,7 @@ func asyncPostWebAction(errChan chan error, url string, body []byte) {
 	}
 
 	if httpResp.StatusCode != http.StatusOK {
-		errChan <- fmt.Errorf("Error invoking action: %s", httpResp.Status)
+		errChan <- fmt.Errorf("Not OK (%s)", httpResp.Status)
 	}
 
 	close(errChan)
