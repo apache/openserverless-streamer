@@ -20,6 +20,7 @@ package handlers
 import (
 	"encoding/json"
 	"errors"
+	"io"
 	"net/http"
 	"strings"
 )
@@ -29,7 +30,11 @@ func injectHostPortInBody(r *http.Request, tcpServerHost string, tcpServerPort s
 	defer body.Close()
 
 	jsonBody := make(map[string]interface{})
-	if err := json.NewDecoder(body).Decode(&jsonBody); err != nil {
+	err := json.NewDecoder(body).Decode(&jsonBody)
+	// In case of a GET request, the body is empty and we have to initialize it manually
+	if err == io.EOF {
+		jsonBody = make(map[string]interface{})
+	} else if err != nil {
 		return nil, err
 	}
 

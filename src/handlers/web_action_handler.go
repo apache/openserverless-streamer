@@ -30,7 +30,7 @@ import (
 
 func WebActionStreamHandler(streamingProxyAddr string, apihost string) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		ctx, done := context.WithCancel(context.Background())
+		ctx, done := context.WithCancel(r.Context())
 
 		namespace, actionToInvoke := getNamespaceAndAction(r)
 		log.Println(fmt.Sprintf("Web Action requested: %s (%s)", actionToInvoke, namespace))
@@ -76,15 +76,14 @@ func WebActionStreamHandler(streamingProxyAddr string, apihost string) func(http
 
 		for {
 			select {
-			case data := <-sock.StreamDataChan:
-				if string(data) == "EOF" {
-					log.Println("EOF received, closing connection")
+			case data, isChannelOpen := <-sock.StreamDataChan:
+				if !isChannelOpen {
 					done()
 					return
 				}
-				_, err := w.Write([]byte("data: " + string(data) + "\n\n"))
+				_, err := w.Write([]byte(string(data) + "\n"))
 				if err != nil {
-					log.Println("Error writing to HTTP response:", err)
+					http.Error(w, "failed to write data: "+err.Error(), http.StatusInternalServerError)
 					done()
 					return
 				}
@@ -99,9 +98,8 @@ func WebActionStreamHandler(streamingProxyAddr string, apihost string) func(http
 				log.Println("Error invoking action:", err)
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				done()
-				return
+				break
 			}
-
 		}
 	}
 }

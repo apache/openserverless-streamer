@@ -20,17 +20,16 @@ package tcp
 import (
 	"context"
 	"errors"
+	"fmt"
 	"io"
 	"log"
 	"net"
-	"sync"
 	"time"
 )
 
 type SocketsServer struct {
 	ctx            context.Context
 	listener       net.Listener
-	wg             sync.WaitGroup
 	Host           string
 	Port           string
 	StreamDataChan chan []byte
@@ -66,15 +65,15 @@ func startTCPServer(ctx context.Context, streamingProxyAddr string) (*SocketsSer
 		StreamDataChan: make(chan []byte),
 	}
 
-	s.wg.Add(1)
 	go s.acceptConnections()
 
-	log.Println("New TCP server listening on:", s.listener.Addr().String())
 	return s, nil
 }
 
 func (s *SocketsServer) acceptConnections() {
-	defer s.wg.Done()
+	_, port, _ := net.SplitHostPort(s.listener.Addr().String())
+	log.Println("TCP server listening on:", port)
+	defer close(s.StreamDataChan)
 
 	for {
 		conn, err := s.listener.Accept()
@@ -83,28 +82,23 @@ func (s *SocketsServer) acceptConnections() {
 			case <-s.ctx.Done():
 				return
 			default:
-				log.Println("accept error", err.Error())
+				log.Println("accept error, retrying...", err.Error())
 			}
 		} else {
-			s.wg.Add(1)
-			go func() {
-				s.handleConnection(conn)
-				s.wg.Done()
-			}()
+			s.handleConnection(conn)
+			return
 		}
 	}
-
 }
 
 func (s *SocketsServer) handleConnection(conn net.Conn) {
 	defer conn.Close()
-	log.Println("New TCP connection accepted!")
+	log.Println(fmt.Sprintf("%s: accepted connection", s.Port))
 	buf := make([]byte, 2048)
 
 ReadLoop:
 	for {
 		select {
-
 		case <-s.ctx.Done():
 			return
 
@@ -120,6 +114,9 @@ ReadLoop:
 					} else if err != io.EOF {
 						log.Println("Error reading from TCP connection", err)
 						return
+					} else {
+						log.Println("Client closed connection")
+						return
 					}
 				}
 
@@ -129,15 +126,12 @@ ReadLoop:
 
 				s.StreamDataChan <- buf[:n]
 			}
-
 		}
 	}
 }
 
 func (s *SocketsServer) WaitToCleanUp() {
 	<-s.ctx.Done()
-	log.Println("Stopping listening on", s.listener.Addr().String())
-	s.listener.Close()
-	s.wg.Wait()
-	log.Print("TCP server closed\n\n")
+	_ = s.listener.Close()
+	log.Println(fmt.Sprintf("%s: stopped listening", s.Port))
 }

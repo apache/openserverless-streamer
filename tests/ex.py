@@ -24,16 +24,16 @@ example_data = [
     "from an HTTP SSE request",
     "Through an openwhisk action",
     "To a socket server",
-    "Back to the HTTP client",
+    "Back to the HTTP client"
 ]
 
 def main(args):
 
     streamer = (args.get("STREAM_HOST"), args.get("STREAM_PORT"))
-    
+
     if not streamer[0] or not streamer[1]:
         return {"body": "please provide a STREAM_HOST and STREAM_PORT"}
-    
+
     print(f"streamer: {streamer}")
 
     # # invoke a call to a streaming api server like OpenAI
@@ -47,8 +47,7 @@ def main(args):
                 print(f"sending: {ex}")
                 s.sendall(ex.encode())
 
-        print("done sending. closing connection")
-        s.sendall("EOF".encode())
+        print("done sending")
         s.close()
-    
+
     return {"body": "done"}
