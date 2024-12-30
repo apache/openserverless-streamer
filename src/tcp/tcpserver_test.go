@@ -102,6 +102,7 @@ func TestHandleConnectionContextCancel(t *testing.T) {
 		// Expected case
 	}
 }
+
 func TestSetupTcpServer(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()

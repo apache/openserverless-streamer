@@ -28,10 +28,9 @@ import (
 
 func ActionStreamHandler(streamingProxyAddr string, apihost string) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		ctx, done := context.WithCancel(context.Background())
+		ctx, done := context.WithCancel(r.Context())
 
 		namespace, actionToInvoke := getNamespaceAndAction(r)
-
 		log.Println(fmt.Sprintf("Private Action request: %s (%s)", actionToInvoke, namespace))
 
 		apiKey, err := extractAuthToken(r)
@@ -48,7 +47,6 @@ func ActionStreamHandler(streamingProxyAddr string, apihost string) func(http.Re
 		// opens a socket for listening in a random port
 		sock, err := tcp.SetupTcpServer(ctx, streamingProxyAddr)
 		if err != nil {
-			log.Println(err.Error())
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			done()
 			return
@@ -62,7 +60,7 @@ func ActionStreamHandler(streamingProxyAddr string, apihost string) func(http.Re
 		}
 
 		// invoke the action
-		res, httpResp, err := client.Actions.Invoke(actionToInvoke, enrichedBody, false, false)
+		_, httpResp, err := client.Actions.Invoke(actionToInvoke, enrichedBody, false, false)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			done()
@@ -71,14 +69,6 @@ func ActionStreamHandler(streamingProxyAddr string, apihost string) func(http.Re
 
 		if httpResp.StatusCode != http.StatusAccepted {
 			http.Error(w, "Error invoking action: "+httpResp.Status, http.StatusInternalServerError)
-			done()
-			return
-		}
-
-		if m, ok := res.(map[string]interface{}); ok {
-			log.Println("Action invoked:", m["activationId"])
-		} else {
-			http.Error(w, "Unexpected reply from action invocation", http.StatusInternalServerError)
 			done()
 			return
 		}
@@ -93,15 +83,14 @@ func ActionStreamHandler(streamingProxyAddr string, apihost string) func(http.Re
 
 		for {
 			select {
-			case data := <-sock.StreamDataChan:
-				if string(data) == "EOF" {
-					log.Println("EOF received, closing connection")
+			case data, isChannelOpen := <-sock.StreamDataChan:
+				if !isChannelOpen {
 					done()
 					return
 				}
-				_, err := w.Write([]byte("data: " + string(data) + "\n\n"))
+				_, err := w.Write([]byte(string(data) + "\n"))
 				if err != nil {
-					log.Println("Error writing to HTTP response:", err)
+					http.Error(w, "failed to write data: "+err.Error(), http.StatusInternalServerError)
 					done()
 					return
 				}

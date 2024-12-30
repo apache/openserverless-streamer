@@ -20,6 +20,7 @@ package handlers
 import (
 	"encoding/json"
 	"errors"
+	"io"
 	"net/http"
 	"strings"
 )
@@ -29,7 +30,11 @@ func injectHostPortInBody(r *http.Request, tcpServerHost string, tcpServerPort s
 	defer body.Close()
 
 	jsonBody := make(map[string]interface{})
-	if err := json.NewDecoder(body).Decode(&jsonBody); err != nil {
+	err := json.NewDecoder(body).Decode(&jsonBody)
+	// In case of a GET request, the body is empty and we have to initialize it manually
+	if err == io.EOF {
+		jsonBody = make(map[string]interface{})
+	} else if err != nil {
 		return nil, err
 	}
 
@@ -60,4 +65,27 @@ func extractAuthToken(r *http.Request) (string, error) {
 	// get the apikey without the Bearer prefix
 	apiKey = strings.TrimPrefix(apiKey, "Bearer ")
 	return apiKey, nil
+}
+
+func ensureProtocolScheme(url string) string {
+	if url == "" {
+		return url
+	}
+	if strings.HasPrefix(url, "http://") {
+		return url
+	}
+	if strings.HasPrefix(url, "https://") {
+		return url
+	}
+	return "https://" + url
+}
+
+func ensurePackagePresent(actionToInvoke string) string {
+	if actionToInvoke == "" {
+		return ""
+	}
+	if !strings.Contains(actionToInvoke, "/") {
+		actionToInvoke = "default" + "/" + actionToInvoke
+	}
+	return actionToInvoke
 }

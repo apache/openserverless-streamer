@@ -30,7 +30,7 @@ import (
 
 func WebActionStreamHandler(streamingProxyAddr string, apihost string) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		ctx, done := context.WithCancel(context.Background())
+		ctx, done := context.WithCancel(r.Context())
 
 		namespace, actionToInvoke := getNamespaceAndAction(r)
 		log.Println(fmt.Sprintf("Web Action requested: %s (%s)", actionToInvoke, namespace))
@@ -63,6 +63,7 @@ func WebActionStreamHandler(streamingProxyAddr string, apihost string) func(http
 		url := fmt.Sprintf("%s/api/v1/web/%s/%s", apihost, namespace, actionToInvoke)
 
 		errChan := make(chan error)
+		defer close(errChan)
 		go asyncPostWebAction(errChan, url, jsonData)
 
 		// Flush the headers
@@ -75,15 +76,14 @@ func WebActionStreamHandler(streamingProxyAddr string, apihost string) func(http
 
 		for {
 			select {
-			case data := <-sock.StreamDataChan:
-				if string(data) == "EOF" {
-					log.Println("EOF received, closing connection")
+			case data, isChannelOpen := <-sock.StreamDataChan:
+				if !isChannelOpen {
 					done()
 					return
 				}
-				_, err := w.Write([]byte("data: " + string(data) + "\n\n"))
+				_, err := w.Write([]byte(string(data) + "\n"))
 				if err != nil {
-					log.Println("Error writing to HTTP response:", err)
+					http.Error(w, "failed to write data: "+err.Error(), http.StatusInternalServerError)
 					done()
 					return
 				}
@@ -98,24 +98,16 @@ func WebActionStreamHandler(streamingProxyAddr string, apihost string) func(http
 				log.Println("Error invoking action:", err)
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				done()
-				return
+				break
 			}
-
 		}
 	}
-}
-
-func ensurePackagePresent(actionToInvoke string) string {
-	if !strings.Contains(actionToInvoke, "/") {
-		actionToInvoke = "default" + "/" + actionToInvoke
-	}
-	return actionToInvoke
 }
 
 func asyncPostWebAction(errChan chan error, url string, body []byte) {
 	bodyReader := strings.NewReader(string(body))
 
-	req, err := http.NewRequest("POST", url, bodyReader)
+	req, err := http.NewRequest("POST", ensureProtocolScheme(url), bodyReader)
 	if err != nil {
 		errChan <- err
 		return
@@ -132,8 +124,6 @@ func asyncPostWebAction(errChan chan error, url string, body []byte) {
 	}
 
 	if httpResp.StatusCode != http.StatusOK {
-		errChan <- fmt.Errorf("Error invoking action: %s", httpResp.Status)
+		errChan <- fmt.Errorf("Not OK (%s)", httpResp.Status)
 	}
-
-	close(errChan)
 }

@@ -36,6 +36,12 @@ func startHTTPServer(streamingProxyAddr string, apihost string) {
 	router.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("Streamer proxy running"))
 	})
+
+	router.HandleFunc("GET /web/{ns}/{action}", handlers.WebActionStreamHandler(streamingProxyAddr, apihost))
+	router.HandleFunc("GET /web/{ns}/{pkg}/{action}", handlers.WebActionStreamHandler(streamingProxyAddr, apihost))
+	router.HandleFunc("GET /action/{ns}/{action}", handlers.ActionStreamHandler(streamingProxyAddr, apihost))
+	router.HandleFunc("GET /action/{ns}/{pkg}/{action}", handlers.ActionStreamHandler(streamingProxyAddr, apihost))
+
 	router.HandleFunc("POST /web/{ns}/{action}", handlers.WebActionStreamHandler(streamingProxyAddr, apihost))
 	router.HandleFunc("POST /web/{ns}/{pkg}/{action}", handlers.WebActionStreamHandler(streamingProxyAddr, apihost))
 	router.HandleFunc("POST /action/{ns}/{action}", handlers.ActionStreamHandler(streamingProxyAddr, apihost))

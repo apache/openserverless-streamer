@@ -125,3 +125,75 @@ func TestGetNamespaceAndAction(t *testing.T) {
 		})
 	}
 }
+
+func TestEnsureProtocolScheme(t *testing.T) {
+	tests := []struct {
+		name     string
+		url      string
+		expected string
+	}{
+		{
+			name:     "valid https",
+			url:      "https://example.com",
+			expected: "https://example.com",
+		},
+		{
+			name:     "valid http",
+			url:      "http://example.com",
+			expected: "http://example.com",
+		},
+		{
+			name:     "empty",
+			url:      "",
+			expected: "",
+		},
+		{
+			name:     "without protocol",
+			url:      "example.com",
+			expected: "https://example.com",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := ensureProtocolScheme(tt.url)
+			require.Equal(t, result, tt.expected)
+		})
+	}
+}
+
+func TestEnsurePackagePresent(t *testing.T) {
+	tests := []struct {
+		name           string
+		actionToInvoke string
+		expected       string
+	}{
+		{
+			name:           "default action",
+			actionToInvoke: "test",
+			expected:       "default/test",
+		},
+		{
+			name:           "packaged action",
+			actionToInvoke: "pkg/test",
+			expected:       "pkg/test",
+		},
+		{
+			name:           "packaged default action",
+			actionToInvoke: "default/test",
+			expected:       "default/test",
+		},
+		{
+			name:           "empty",
+			actionToInvoke: "",
+			expected:       "",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := ensurePackagePresent(tt.actionToInvoke)
+			require.Equal(t, result, tt.expected)
+		})
+	}
+}

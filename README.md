@@ -37,10 +37,10 @@ Other environment variables can be set to configure the streamer:
 
 ## Endpoints
 
-The streamer exposes the following endpoints:
+The streamer exposes the following endpoints (use POST in case you need to send arguments to the action):
 
-- `POST /action/{namespace}/{action}`: to invoke the OpenWhisk action on the given namespace, default package, and action name. It requires an a Authorization header with Bearer token with the OpenWhisk AUTH token
-- `POST /action/{namespace}/{package}/{action}`: to invoke the OpenWhisk action on the given namespace, custom package, and action name. It requires an a Authorization header with Bearer token with the OpenWhisk AUTH token
+- `GET/POST /action/{namespace}/{action}`: to invoke the OpenWhisk action on the given namespace, default package, and action name. It requires an a Authorization header with Bearer token with the OpenWhisk AUTH token
+- `GET/POST /action/{namespace}/{package}/{action}`: to invoke the OpenWhisk action on the given namespace, custom package, and action name. It requires an a Authorization header with Bearer token with the OpenWhisk AUTH token
 
-- `POST /web/{namespace}/{action}`: to invoke an OpenWhisk web action on the given namespace, default package, and action name.
-- `POST /web/{namespace}/{package}/{action}`: to invoke an OpenWhisk web action on the given namespace, custom package, and action name.
+- `GET/POST /web/{namespace}/{action}`: to invoke an OpenWhisk web action on the given namespace, default package, and action name.
+- `GET/POST /web/{namespace}/{package}/{action}`: to invoke an OpenWhisk web action on the given namespace, custom package, and action name.
