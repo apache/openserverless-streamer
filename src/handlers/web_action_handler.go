@@ -63,6 +63,7 @@ func WebActionStreamHandler(streamingProxyAddr string, apihost string) func(http
 		url := fmt.Sprintf("%s/api/v1/web/%s/%s", apihost, namespace, actionToInvoke)
 
 		errChan := make(chan error)
+		defer close(errChan)
 		go asyncPostWebAction(errChan, url, jsonData)
 
 		// Flush the headers
@@ -127,6 +128,4 @@ func asyncPostWebAction(errChan chan error, url string, body []byte) {
 	if httpResp.StatusCode != http.StatusOK {
 		errChan <- fmt.Errorf("Not OK (%s)", httpResp.Status)
 	}
-
-	close(errChan)
 }
