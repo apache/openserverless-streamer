@@ -19,7 +19,6 @@ package handlers
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"net/http"
 
@@ -31,7 +30,7 @@ func ActionStreamHandler(streamingProxyAddr string, apihost string) func(http.Re
 		ctx, done := context.WithCancel(r.Context())
 
 		namespace, actionToInvoke := getNamespaceAndAction(r)
-		log.Println(fmt.Sprintf("Private Action request: %s (%s)", actionToInvoke, namespace))
+		log.Printf("Private Action request: %s (%s)", actionToInvoke, namespace)
 
 		apiKey, err := extractAuthToken(r)
 		if err != nil {
