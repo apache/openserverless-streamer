@@ -118,7 +118,7 @@ func TestAsyncPostWebAction(t *testing.T) {
 			name:           "Error in request creation",
 			url:            "1231",
 			body:           []byte(`{"key": "value"}`),
-			expectedErrMsg: "connect: no route to host",
+			expectedErrMsg: "no such host",
 		},
 		{
 			name: "Non-200 status code",
@@ -127,7 +127,7 @@ func TestAsyncPostWebAction(t *testing.T) {
 			handler: func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusInternalServerError)
 			},
-			expectedErrMsg: "Not OK (500 Internal Server Error)",
+			expectedErrMsg: "not ok (500 Internal Server Error)",
 		},
 	}
 

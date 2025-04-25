@@ -98,3 +98,5 @@ openserverless-runtimes
 
 runtimes.json
 action/**/*
+
+streamer

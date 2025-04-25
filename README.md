@@ -19,16 +19,17 @@
 
 # Apache OpenServerless Streamer (incubating)
 
-The OpenServerless streamer is a tool to relay a stream from OpenWhisk actions to an outside
-HTTP client.
+The OpenServerless streamer is a tool to relay a stream from OpenWhisk actions 
+to an outside HTTP client.
 
-The streamer is a simple HTTP server that exposes an endpoint /stream/{namespace}/{action} to 
-invoke the relative OpenWhisk action, open a socket for the action to write to, and relay the
-output to the client.
+The streamer is a simple HTTP server that exposes an endpoint 
+/stream/{namespace}/{action} to invoke the relative OpenWhisk action, open a 
+socket for the action to write to, and relay the output to the client.
 
 It expects 2 environment variables to be set:
 - `OW_APIHOST`: the OpenWhisk API host
-- `STREAMER_ADDR`: the address of the streamer server for the OpenWhisk actions to connect to
+- `STREAMER_ADDR`: the address of the streamer server for the OpenWhisk actions 
+                    to connect to
 
 Other environment variables can be set to configure the streamer:
 
@@ -37,10 +38,19 @@ Other environment variables can be set to configure the streamer:
 
 ## Endpoints
 
-The streamer exposes the following endpoints (use POST in case you need to send arguments to the action):
+The streamer exposes the following endpoints (use POST in case you need to send 
+arguments to the action):
 
-- `GET/POST /action/{namespace}/{action}`: to invoke the OpenWhisk action on the given namespace, default package, and action name. It requires an a Authorization header with Bearer token with the OpenWhisk AUTH token
-- `GET/POST /action/{namespace}/{package}/{action}`: to invoke the OpenWhisk action on the given namespace, custom package, and action name. It requires an a Authorization header with Bearer token with the OpenWhisk AUTH token
+- `GET/POST /action/{namespace}/{action}`: to invoke the OpenWhisk action on the 
+given namespace, default package, and action name. It requires an Authorization
+header with Bearer token with the OpenWhisk AUTH token.
 
-- `GET/POST /web/{namespace}/{action}`: to invoke an OpenWhisk web action on the given namespace, default package, and action name.
-- `GET/POST /web/{namespace}/{package}/{action}`: to invoke an OpenWhisk web action on the given namespace, custom package, and action name.
+- `GET/POST /action/{namespace}/{package}/{action}`: to invoke the OpenWhisk 
+action on the given namespace, custom package, and action name. It requires an 
+Authorization header with Bearer token with the OpenWhisk AUTH token
+
+- `GET/POST /web/{namespace}/{action}`: to invoke an OpenWhisk web action on the 
+given namespace, default package, and action name.
+
+- `GET/POST /web/{namespace}/{package}/{action}`: to invoke an OpenWhisk web 
+action on the given namespace, custom package, and action name.

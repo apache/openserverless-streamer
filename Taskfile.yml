@@ -35,7 +35,7 @@ tasks:
       - git tag -f {{.BASETAG}}.$(date +%y%m%d%H%M)
       - env PAGER= git tag
       
-  build:    
+  buildx:    
     cmds:
       - |
         IMG="{{.BASEIMG}}:{{.TAG}}"
@@ -43,3 +43,19 @@ tasks:
         then {{.DRY}} docker buildx build -t $IMG --platform linux/amd64,linux/arm64 . --push
         else {{.DRY}} docker buildx build -t $IMG . --load
         fi
+
+  test:
+    cmds:
+      - |
+        cd src
+        go test -v ./...
+        cd ../
+  
+  build:
+    cmds:
+      - |
+        rm -f streamer
+        cd src
+        go build -o ../streamer
+        cd ../
+    
