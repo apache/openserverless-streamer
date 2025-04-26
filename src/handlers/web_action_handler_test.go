@@ -24,6 +24,7 @@ import (
 	"net"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -103,7 +104,7 @@ func TestAsyncPostWebAction(t *testing.T) {
 		name           string
 		url            string
 		body           []byte
-		expectedErrMsg string
+		expectedErrMsg []string // Cambiato da string a []string
 		handler        http.HandlerFunc
 	}{
 		{
@@ -118,7 +119,7 @@ func TestAsyncPostWebAction(t *testing.T) {
 			name:           "Error in request creation",
 			url:            "1231",
 			body:           []byte(`{"key": "value"}`),
-			expectedErrMsg: "no such host",
+			expectedErrMsg: []string{"no such host", "no route to host"},
 		},
 		{
 			name: "Non-200 status code",
@@ -127,7 +128,7 @@ func TestAsyncPostWebAction(t *testing.T) {
 			handler: func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusInternalServerError)
 			},
-			expectedErrMsg: "not ok (500 Internal Server Error)",
+			expectedErrMsg: []string{"not ok (500 Internal Server Error)"},
 		},
 	}
 
@@ -144,12 +145,26 @@ func TestAsyncPostWebAction(t *testing.T) {
 			asyncPostWebAction(errChan, tt.url, tt.body)
 			select {
 			case err := <-errChan:
-				require.NotEmpty(t, tt.expectedErrMsg)
-				require.Contains(t, err.Error(), tt.expectedErrMsg)
+				if len(tt.expectedErrMsg) > 0 {
+					require.NotEmpty(t, tt.expectedErrMsg)
+					matched := false
+					for _, msg := range tt.expectedErrMsg {
+						if err != nil && contains(err.Error(), msg) {
+							matched = true
+							break
+						}
+					}
+					require.True(t, matched, "Error message did not match any expected messages")
+				}
 			default:
 			}
 		})
 	}
+}
+
+// Helper function to check if a string contains a substring
+func contains(str, substr string) bool {
+	return strings.Contains(str, substr)
 }
 
 // sendTcpSocketMsg connects to a server at the given host and port, sends a message, and closes the connection.

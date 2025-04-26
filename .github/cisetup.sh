@@ -1,3 +1,4 @@
+#!/bin/bash
 # Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -15,35 +16,5 @@
 # specific language governing permissions and limitations
 # under the License.
 #
-header:
-  license:
-    spdx-id: Apache-2.0
-    copyright-owner: Apache Software Foundation
-
-  paths-ignore:
-    - '**/*.sample'
-    - 'env.src'
-    - '.git-hooks/pre-commit'
-    - '**/_*'
-    - 'nuvroot.json'
-    - 'LICENSE'
-    - 'NOTICE'
-    - 'DISCLAIMER'
-    - 'cert-manager.yaml'
-    - 'ingress-deploy.yaml'
-    - 'runtimes.json'
-    - '**/*.json'
-    - '**/*.service'
-    - 'update/update.ps1' 
-    - '**/mime.types'
-    - '**/*.txt'
-    - '.env.example'
-    - 'go.sum'
-    - 'go.mod'
-    - 'openwhisk/_test/**'
-    - '.gitattributes'
-    - '.env.dist'
-    - '**/.npmrc'
-    - 'customkitd.toml'
-    - 'runtimes.json'
-    - 'runtimes.json.tpl'
+sudo sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b /usr/local/bin
+sudo apt-get -y install curl wget jq

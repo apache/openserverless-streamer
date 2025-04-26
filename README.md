@@ -33,7 +33,7 @@ It expects 2 environment variables to be set:
 
 Other environment variables can be set to configure the streamer:
 
-- `HTTP_SERVER_PORT`: the port the streamer server listens on (default: 8181)
+- `HTTP_SERVER_PORT`: the port the streamer server listens on (default: 80)
 
 
 ## Endpoints
@@ -54,3 +54,77 @@ given namespace, default package, and action name.
 
 - `GET/POST /web/{namespace}/{package}/{action}`: to invoke an OpenWhisk web 
 action on the given namespace, custom package, and action name.
+
+## Tasks
+
+Taskfile supports the following tasks:
+
+```yaml
+* build:              Build the streamer binary locally. This will create a binary named streamer in the current directory. 
+* buildx:             Build the docker image using buildx. Set PUSH=1 to push the image to the registry. 
+* docker-login:       Login to the docker registry. Set REGISTRY=ghcr or REGISTRY=dockerhub in .env to use the respective registry. 
+* image-tag:          Create a new tag for the current git commit.       
+* run:                Run the streamer binary locally, using configuration from .env file 
+* test:               Run the tests in the src directory. 
+```
+
+## Build and push
+
+### Private registry or local image
+
+To build an image and push it on a private repository, firstly choose which
+registry you want to use.
+Tasks support is for Github (ghcr) and Dockerhub (dockerhub).
+So copy the `.env.example` to `.env` and configure the required variables for
+authentication and set the `REGISTRY` and `NAMESPACE` accordly.
+
+Now create a new tag
+
+```bash
+$ task image-tag
+```
+You should see an output like this:
+
+```bash
+Deleted tag '0.1.0-rc1-incubating.2504260711' (was 5a2f6d3)
+0.1.0-rc1-incubating.2504260905
+```
+
+:bulb: **NOTE** If you leave unset `REGISTRY` a local `openserverless-streamer` 
+image will be built, using the generated tag.
+
+If you setup the `REGISTRY` and `NAMESPACE`, you can give a:
+
+```bash
+$ task docker-login
+```
+
+To build:
+
+```bash
+$ task buildx
+```
+
+To build and push
+
+```bash
+$ task buildx PUSH=1
+```
+
+### Apache repository
+To build an official Apache OpensSrverless Streamer image, you
+need to be a committer.
+
+If you have the proper permissions, the build process will start pushing a
+new tag to apache/openserverless-streamer repository.
+So, for example,  if your tag is `0.1.0-rc1-incubating.2504260905` and your
+git remote is `apache`
+
+```bash
+$ git push apache 0.1.0-rc1-incubating.2504260905
+```
+
+This will trigger the build workflow, and the process will be visible at
+https://github.com/apache/openserverless-streamer/actions
+
+
