@@ -67,7 +67,7 @@ tasks:
         if [ "$REGISTRY" = "ghcr" ]; then
           echo "ghcr.io/$NAMESPACE/openserverless-streamer"
         elif [ "$REGISTRY" = "dockerhub" ]; then
-          echo "registry.hub.docker.com/$NAMESPACE/openserverless-streamer"
+          echo "docker.io/$NAMESPACE/openserverless-streamer"
         else
           echo "openserverless-streamer"
         fi
