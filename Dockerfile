@@ -15,11 +15,12 @@
 #
 
 # Do not fix the patch level for golang:1.23 to automatically get security fixes.
-FROM golang:1.23 AS builder
-ADD src /src
+FROM golang:1.23-alpine AS builder
 WORKDIR /src
-RUN go build -o /bin/streamer
+COPY src/ .
+ENV CGO_ENABLED=0 GOOS=linux
+RUN go build -ldflags="-s -w" -o streamer
 
-FROM golang:1.23
-COPY --from=builder /bin/streamer /streamer
-CMD ["/streamer"]
+FROM scratch
+COPY --from=builder /src/streamer /streamer
+ENTRYPOINT ["/streamer"]
