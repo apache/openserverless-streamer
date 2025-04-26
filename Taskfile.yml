@@ -18,33 +18,90 @@
 version: "3"
 
 vars:
-  BASETAG: 0.1.0-rc0-incubating
-  BASEIMG: registry.hub.docker.com/apache/openserverless-streamer
+  BASETAG: 0.1.0-rc1-incubating
   COMMIT_ID:
     sh: git rev-parse --short HEAD
   TAG:
     sh: git describe --tags --abbrev=0 2>/dev/null || echo latest
 
+dotenv:
+  - .env
 
 tasks:
+
+  docker-login-ghcr: >
+    silent: true
+    cmds: 
+      - |
+        echo "Logging in to ghcr.io as $GITHUB_USER"
+        echo $GITHUB_TOKEN | docker login ghcr.io -u $GITHUB_USER --password-stdin
   
+  docker-login-dockerhub:
+    silent: true
+    cmds: 
+      - |
+        echo "Logging in to dockerhub as $DOCKERHUB_USER"
+        echo $DOCKERHUB_TOKEN | docker login -u $DOCKERHUB_USER --password-stdin
+
+  docker-login:
+    desc: |
+      Login to the docker registry. Set REGISTRY=ghcr or REGISTRY=dockerhub in .env
+      to use the respective registry.
+    silent: true
+    cmds:
+      - |
+        if [ -z "$REGISTRY" ]; then
+          echo "Error: REGISTRY variable is not set in .env"
+          exit 1
+        fi
+        task docker-login-$REGISTRY
+  
+  base-image-name:
+    silent: true
+    cmds:
+      - |
+        if [ -n "$REGISTRY" ] && [ -z "$NAMESPACE" ]; then
+          echo "Error: NAMESPACE variable is not set in .env"
+          exit 1
+        fi
+        if [ "$REGISTRY" = "ghcr" ]; then
+          echo "ghcr.io/$NAMESPACE/openserverless-streamer"
+        elif [ "$REGISTRY" = "dockerhub" ]; then
+          echo "registry.hub.docker.com/$NAMESPACE/openserverless-streamer"
+        else
+          echo "openserverless-streamer"
+        fi
+
   image-tag:
     silent: true
+    desc: |
+      Create a new tag for the current git commit.      
     cmds:
       - git tag -d $(git tag)
       - git tag -f {{.BASETAG}}.$(date +%y%m%d%H%M)
       - env PAGER= git tag
       
-  buildx:    
+  buildx:
+    desc: |
+      Build the docker image using buildx. Set PUSH=1 to push the image to the registry.
+    silent: true
     cmds:
       - |
-        IMG="{{.BASEIMG}}:{{.TAG}}"
-        if test -n "{{.PUSH}}"
-        then {{.DRY}} docker buildx build -t $IMG --platform linux/amd64,linux/arm64 . --push
-        else {{.DRY}} docker buildx build -t $IMG . --load
+        BASEIMG=$(task base-image-name)
+        IMG="$BASEIMG:{{.TAG}}"
+        if [ -n "{{.PUSH}}" ]; then
+          if [ -z "$REGISTRY" ]; then
+            echo "Error: REGISTRY variable must be set in .env to push the image"
+            exit 1
+          fi
+          {{.DRY}} docker buildx build -t $IMG --platform linux/amd64,linux/arm64 . --push
+        else
+          {{.DRY}} docker buildx build -t $IMG . --load
         fi
 
   test:
+    desc: |
+      Run the tests in the src directory.
     cmds:
       - |
         cd src
@@ -52,10 +109,30 @@ tasks:
         cd ../
   
   build:
+    desc: |
+      Build the streamer binary locally. This will create a binary named streamer in the current directory.
+    silent: true
     cmds:
       - |
         rm -f streamer
         cd src
-        go build -o ../streamer
+        echo "Building streamer binary..."
+        if test -n "{{.OPTIMIZE}}" 
+        then {{.DRY}} CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o ../streamer
+        else {{.DRY}} go build -o ../streamer
+        fi
+        if [ -f ../streamer ]; then
+          echo "Streamer binary built successfully."
+        else
+          echo "Error: Streamer binary not found."
+          exit 1
+        fi
         cd ../
-    
+  
+  run:
+    desc: |
+      Run the streamer binary locally, using configuration from .env file
+    cmds:
+      - task: build
+      - ./streamer
+
