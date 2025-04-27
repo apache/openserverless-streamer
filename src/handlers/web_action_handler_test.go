@@ -104,27 +104,37 @@ func TestAsyncPostWebAction(t *testing.T) {
 		name           string
 		url            string
 		body           []byte
-		expectedErrMsg []string // Cambiato da string a []string
+		headers        map[string]string
+		expectedErrMsg []string
 		handler        http.HandlerFunc
 	}{
 		{
 			name: "Successful request",
 			url:  "/success",
 			body: []byte(`{"key": "value"}`),
+			headers: map[string]string{
+				"Content-Type": "application/json",
+			},
 			handler: func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusOK)
 			},
 		},
 		{
-			name:           "Error in request creation",
-			url:            "1231",
-			body:           []byte(`{"key": "value"}`),
+			name: "Error in request creation",
+			url:  "1231",
+			body: []byte(`{"key": "value"}`),
+			headers: map[string]string{
+				"Content-Type": "application/json",
+			},
 			expectedErrMsg: []string{"no such host", "no route to host"},
 		},
 		{
 			name: "Non-200 status code",
 			url:  "/error",
 			body: []byte(`{"key": "value"}`),
+			headers: map[string]string{
+				"Content-Type": "application/json",
+			},
 			handler: func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusInternalServerError)
 			},
@@ -142,7 +152,7 @@ func TestAsyncPostWebAction(t *testing.T) {
 				tt.url = server.URL + tt.url
 			}
 
-			asyncPostWebAction(errChan, tt.url, tt.body)
+			asyncPostWebAction(errChan, tt.url, tt.body, tt.headers)
 			select {
 			case err := <-errChan:
 				if len(tt.expectedErrMsg) > 0 {
