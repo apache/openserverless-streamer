@@ -33,12 +33,12 @@ jobs:
         run: |
           sudo rm -rf /usr/share/dotnet
           sudo rm -rf "$AGENT_TOOLSDIRECTORY"
-      - name: Setup
-        run: bash .github/cisetup.sh
       - name: Checkout
         uses: actions/checkout@v2
         with:
           submodules: recursive
+      - name: Setup
+        run: bash .github/cisetup.sh
       - name: License
         uses: apache/skywalking-eyes@main
       - name: Assign TAG from pull request
