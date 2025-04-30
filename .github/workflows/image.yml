@@ -33,12 +33,12 @@ jobs:
         run: |
           sudo rm -rf /usr/share/dotnet
           sudo rm -rf "$AGENT_TOOLSDIRECTORY"
-      - name: Setup
-        run: bash .github/cisetup.sh
       - name: Checkout
         uses: actions/checkout@v2
         with:
           submodules: recursive
+      - name: Setup
+        run: bash .github/cisetup.sh
       - name: License
         uses: apache/skywalking-eyes@main
       - name: Assign TAG from pull request
@@ -58,16 +58,14 @@ jobs:
           registry: registry.hub.docker.com
           username: ${{ secrets.DOCKERHUB_USER }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+        with:
+          image: tonistiigi/binfmt:qemu-v7.0.0-28
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-        with:
-          version: "lab:latest"
-          use: true
-      - name: Build and push
-        uses: docker/build-push-action@v5
-        with:          
-          platforms: linux/amd64, linux/arm64
-          tags: apache/openserverless-streamer:${{ env.IMG_TAG }}     
-          # For pull requests, export results to the build cache.
-          # Otherwise, push to a registry.
-          outputs: ${{ github.event_name == 'pull_request' && 'type=cacheonly' || 'type=registry,push=true' }}
+      - name: Image
+        env:
+          REGISTRY: apache
+          NAMESPACE: apache
+        run: task buildx PUSH=1 TAG=$IMG_TAG
