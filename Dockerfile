@@ -22,5 +22,6 @@ ENV CGO_ENABLED=0 GOOS=linux
 RUN go build -ldflags="-s -w" -o streamer
 
 FROM scratch
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ 
 COPY --from=builder /src/streamer /streamer
 ENTRYPOINT ["/streamer"]

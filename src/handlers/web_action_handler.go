@@ -62,9 +62,18 @@ func WebActionStreamHandler(streamingProxyAddr string, apihost string) func(http
 		}
 		url := fmt.Sprintf("%s/api/v1/web/%s/%s", apihost, namespace, actionToInvoke)
 
+		// Read headers and set them in the request
+		headers := make(map[string]string)
+		for key, values := range r.Header {
+			// Use the first value for the header
+			if len(values) > 0 {
+				headers[key] = values[0]
+			}
+		}
+
 		errChan := make(chan error)
 		defer close(errChan)
-		go asyncPostWebAction(errChan, url, jsonData)
+		go asyncPostWebAction(errChan, url, jsonData, headers)
 
 		// Flush the headers
 		flusher, ok := w.(http.Flusher)
@@ -104,7 +113,7 @@ func WebActionStreamHandler(streamingProxyAddr string, apihost string) func(http
 	}
 }
 
-func asyncPostWebAction(errChan chan error, url string, body []byte) {
+func asyncPostWebAction(errChan chan error, url string, body []byte, headers map[string]string) {
 	bodyReader := strings.NewReader(string(body))
 
 	req, err := http.NewRequest("POST", ensureProtocolScheme(url), bodyReader)
@@ -116,6 +125,11 @@ func asyncPostWebAction(errChan chan error, url string, body []byte) {
 	req.Header.Set("Content-Length", fmt.Sprintf("%d", bodyReader.Len()))
 	req.ContentLength = int64(bodyReader.Len())
 
+	// Aggiungi le intestazioni opzionali
+	for key, value := range headers {
+		req.Header.Set(key, value)
+	}
+
 	client := &http.Client{}
 	httpResp, err := client.Do(req)
 	if err != nil {
@@ -123,15 +137,7 @@ func asyncPostWebAction(errChan chan error, url string, body []byte) {
 		return
 	}
 
-	// We need to handle status in the range from 200 to 299
-	// as success, and everything else as an error.
-	// In particular, we need to handle 202 Accepted
-	// as a success, because the action is invoked
-	// asynchronously and the response is not available yet.
-	// We also need to handle 204 No Content as a success,
-	// because the action is invoked and there is no response.
-	// It seems that the invoker is releasing a 202 Accepted
-	// after 60 seconds, so we need to handle that as well.
+	// Gestione dello stato HTTP
 	if httpResp.StatusCode < 200 || httpResp.StatusCode >= 300 {
 		errChan <- fmt.Errorf("not ok (%s)", httpResp.Status)
 	} else {
