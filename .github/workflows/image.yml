@@ -66,6 +66,6 @@ jobs:
         uses: docker/setup-buildx-action@v3
       - name: Image
         env:
-          REGISTRY: dockerhub
+          REGISTRY: apache
           NAMESPACE: apache
         run: task buildx PUSH=1 TAG=$IMG_TAG
