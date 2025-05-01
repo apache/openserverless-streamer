@@ -67,4 +67,5 @@ jobs:
       - name: Image
         env:
           REGISTRY: dockerhub
+          NAMESPACE: apache
         run: task buildx PUSH=1
