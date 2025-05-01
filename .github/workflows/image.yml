@@ -68,4 +68,4 @@ jobs:
         env:
           REGISTRY: dockerhub
           NAMESPACE: apache
-        run: task buildx PUSH=1
+        run: task buildx PUSH=1 TAG=$IMG_TAG
