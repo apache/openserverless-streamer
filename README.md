@@ -28,12 +28,18 @@ socket for the action to write to, and relay the output to the client.
 
 It expects 2 environment variables to be set:
 - `OW_APIHOST`: the OpenWhisk API host
-- `STREAMER_ADDR`: the address of the streamer server for the OpenWhisk actions 
-                    to connect to
+- `STREAMER_ADDR`: the address of the streamer server for the OpenWhisk actions to connect to
 
 Other environment variables can be set to configure the streamer:
 
 - `HTTP_SERVER_PORT`: the port the streamer server listens on (default: 80)
+  
+Cors handling is handled through these variables:
+
+- `CORS_ENABLED`: set to 1 or true to enable the CORS handler
+- `CORS_ALLOW_ORIGIN`: this defaults to `*`
+- `CORS_ALLOW_METHODS`: this defaults to `GET,POST,OPTIONS`
+- `CORS_ALLOW_HEADERS`: this defaults to `Authorization,Content-Type`
 
 
 ## Endpoints
@@ -61,7 +67,8 @@ Taskfile supports the following tasks:
 
 ```yaml
 * build:              Build the streamer binary locally. This will create a binary named streamer in the current directory. 
-* buildx:             Build the docker image using buildx. Set PUSH=1 to push the image to the registry. 
+* buildx:             Build the docker image using buildx. Set PUSH=1 to push the image to the registry.
+* clean:              Clean up the build artifacts. This will remove the streamer binary and clean the go cache. 
 * docker-login:       Login to the docker registry. Set REGISTRY=ghcr or REGISTRY=dockerhub in .env to use the respective registry. 
 * image-tag:          Create a new tag for the current git commit.       
 * run:                Run the streamer binary locally, using configuration from .env file 

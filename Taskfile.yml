@@ -131,6 +131,17 @@ tasks:
         fi
         cd ../
   
+  clean:
+    desc: |
+      Clean up the build artifacts. This will remove the streamer binary and clean the go cache.
+    cmds:  
+    - |
+      rm -f streamer || true
+      cd src
+      go clean -cache -modcache -testcache -fuzzcache
+      cd ../
+      echo "Cleaned up build artifacts."
+
   run:
     desc: |
       Run the streamer binary locally, using configuration from .env file
