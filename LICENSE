@@ -216,3 +216,125 @@ Spray Caching 1.3.4 (io.spray:spray-caching_2.11:1.3.4 - http://spray.io/documen
 This product bundles the files gradlew and gradlew.bat from Gradle v5.5
 which are distributed under the Apache License, Version 2.0.
 For details see ./gradlew and ./gradlew.bat.
+
+
+==============================================================================
+BEGIN BUNDLED THIRD-PARTY SOFTWARE INVENTORY (container image)
+==============================================================================
+
+==============================================================================
+LICENSES OF BUNDLED THIRD-PARTY SOFTWARE
+Container image: apache/openserverless-streamer
+==============================================================================
+
+Apache OpenServerless itself is licensed under the Apache License,
+Version 2.0, reproduced above. The container image built from the
+Dockerfile beside this file additionally bundles the third-party
+components listed below, each under its own license.
+
+Refer to https://www.apache.org/legal/resolved.html for the ASF
+classification of these licenses. Components that are NOT compatible
+with the Apache License 2.0 are enumerated in the WARN file.
+
+------------------------------------------------------------------------------
+Summary by license
+------------------------------------------------------------------------------
+
+Apache-2.0
+    github.com/apache/openwhisk-client-go (v0.0.0-20241028140229-bb8408824b9b)
+    github.com/cloudfoundry/jibber_jabber (v0.0.0-20151120183258-bcc4c8345a21)
+    github.com/pelletier/go-toml (v1.9.5)
+
+Apache-2.0 AND MIT
+    gopkg.in/yaml.v2 (v2.4.0)
+    gopkg.in/yaml.v3 (v3.0.1)
+
+BSD-2-Clause
+    gopkg.in/check.v1 (v0.0.0-20161208181325-20d25e280405)
+
+BSD-3-Clause
+    github.com/fsnotify/fsnotify (v1.6.0)
+    github.com/google/go-cmp (v0.5.2)
+    github.com/google/go-querystring (v1.1.0)
+    github.com/pmezard/go-difflib (v1.0.1-0.20181226105442-5d4384ee4fb2)
+    golang.org/x/net (v0.38.0)
+    golang.org/x/sys (v0.31.0)
+    golang.org/x/text (v0.23.0)
+    gopkg.in/tomb.v1 (v1.0.0-20141024135613-dd632973f1e7)
+
+ISC
+    github.com/davecgh/go-spew (v1.1.2-0.20180830191138-d8f796af33cc)
+
+MIT
+    github.com/fatih/color (v1.17.0)
+    github.com/hokaccha/go-prettyjson (v0.0.0-20211117102719-0474bc63780f)
+    github.com/mattn/go-colorable (v0.1.13)
+    github.com/mattn/go-isatty (v0.0.20)
+    github.com/nicksnyder/go-i18n (v1.10.3)
+    github.com/nxadm/tail (v1.4.11)
+    github.com/onsi/ginkgo (v1.15.0)
+    github.com/onsi/gomega (v1.10.5)
+    github.com/stretchr/testify (v1.9.0)
+
+MPL-2.0
+    CA certificates bundle ((Alpine ca-certificates))
+
+------------------------------------------------------------------------------
+Detail by component
+------------------------------------------------------------------------------
+
+Go module dependencies (src/go.mod, src/go.sum)
+-----------------------------------------------
+  github.com/apache/openwhisk-client-go (v0.0.0-20241028140229-bb8408824b9b) -- Apache-2.0
+      Apache OpenWhisk.
+  github.com/stretchr/testify (v1.9.0) -- MIT
+      Test-only dependency.
+  github.com/cloudfoundry/jibber_jabber (v0.0.0-20151120183258-bcc4c8345a21) -- Apache-2.0
+  github.com/davecgh/go-spew (v1.1.2-0.20180830191138-d8f796af33cc) -- ISC
+  github.com/fatih/color (v1.17.0) -- MIT
+  github.com/google/go-querystring (v1.1.0) -- BSD-3-Clause
+  github.com/hokaccha/go-prettyjson (v0.0.0-20211117102719-0474bc63780f) -- MIT
+  github.com/mattn/go-colorable (v0.1.13) -- MIT
+  github.com/mattn/go-isatty (v0.0.20) -- MIT
+  github.com/nicksnyder/go-i18n (v1.10.3) -- MIT
+  github.com/nxadm/tail (v1.4.11) -- MIT
+  github.com/pelletier/go-toml (v1.9.5) -- Apache-2.0
+  github.com/pmezard/go-difflib (v1.0.1-0.20181226105442-5d4384ee4fb2) -- BSD-3-Clause
+  golang.org/x/net (v0.38.0) -- BSD-3-Clause
+  golang.org/x/sys (v0.31.0) -- BSD-3-Clause
+  golang.org/x/text (v0.23.0) -- BSD-3-Clause
+  gopkg.in/yaml.v2 (v2.4.0) -- Apache-2.0 AND MIT
+  gopkg.in/yaml.v3 (v3.0.1) -- Apache-2.0 AND MIT
+  github.com/onsi/ginkgo (v1.15.0) -- MIT
+      Test-only, transitive.
+  github.com/onsi/gomega (v1.10.5) -- MIT
+      Test-only, transitive.
+  github.com/fsnotify/fsnotify (v1.6.0) -- BSD-3-Clause
+      Transitive.
+  github.com/google/go-cmp (v0.5.2) -- BSD-3-Clause
+      Test-only, transitive.
+  gopkg.in/check.v1 (v0.0.0-20161208181325-20d25e280405) -- BSD-2-Clause
+      Test-only, transitive.
+  gopkg.in/tomb.v1 (v1.0.0-20141024135613-dd632973f1e7) -- BSD-3-Clause
+      Transitive.
+  CA certificates bundle ((Alpine ca-certificates)) -- MPL-2.0
+      Category B: copied unmodified from the builder stage.
+
+------------------------------------------------------------------------------
+Full license texts
+------------------------------------------------------------------------------
+
+The complete text of the Apache License 2.0 is reproduced at the top of
+this file. The complete texts of the other licenses referenced above are
+distributed with each component inside the container image, in the
+package metadata directories of the respective package manager:
+
+  * Python packages: <site-packages>/<dist>.dist-info/ (LICENSE, METADATA)
+  * Node.js packages: /node_modules/<pkg>/LICENSE
+  * PHP packages:     /phpAction/composer/vendor/<pkg>/LICENSE
+  * Go modules:       vendored module sources / pkg.go.dev
+  * Debian packages:  /usr/share/doc/<pkg>/copyright
+
+==============================================================================
+END BUNDLED THIRD-PARTY SOFTWARE INVENTORY
+==============================================================================

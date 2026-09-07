@@ -18,88 +18,104 @@
 version: "3"
 
 vars:
-  BASETAG: 0.1.0-incubating
+  BASETAG: 0.9.0-incubating
+  SUFFIX: "-snapshot"
   COMMIT_ID:
     sh: git rev-parse --short HEAD
+  # taken from the tag - overridable with STREAMER_TAG env var
   TAG:
-    sh: git describe --tags --abbrev=0 2>/dev/null || echo latest
+    sh: echo "${STREAMER_TAG:-$(git describe --tags --abbrev=0 2>/dev/null || git rev-parse --short HEAD)}"
+  # taken from the Dockerfile - overridable with MY_STREAMER_IMAGE env var
+  STREAMER_IMAGE:
+    sh: echo "${MY_STREAMER_IMAGE:-$(awk -F= '/ARG STREAMER_IMAGE_DEFAULT=/ { print $2 ; exit }' Dockerfile)}"
 
 dotenv:
   - .env
 
 tasks:
 
-  docker-login-ghcr: >
+  docker-login-ghcr:
     silent: true
-    cmds: 
+    cmds:
       - |
         echo "Logging in to ghcr.io as $GITHUB_USER"
         echo $GITHUB_TOKEN | docker login ghcr.io -u $GITHUB_USER --password-stdin
-  
+
   docker-login-dockerhub:
     silent: true
-    cmds: 
+    cmds:
       - |
-        echo "Logging in to dockerhub as $DOCKERHUB_USER"
-        echo $DOCKERHUB_TOKEN | docker login -u $DOCKERHUB_USER --password-stdin
+        echo "Logging in to docker.io as $DOCKERHUB_USER"
+        echo $DOCKERHUB_TOKEN | docker login docker.io -u $DOCKERHUB_USER --password-stdin
 
   docker-login:
     desc: |
-      Login to the docker registry. Set REGISTRY=ghcr or REGISTRY=dockerhub in .env
-      to use the respective registry.
+      Login to the registry the image name points to: docker.io for apache images,
+      ghcr.io otherwise.
     silent: true
     cmds:
       - |
-        if [ -z "$REGISTRY" ]; then
-          echo "Error: REGISTRY variable is not set in .env"
-          exit 1
-        fi
-        task docker-login-$REGISTRY
-  
-  base-image-name:
-    silent: true
-    cmds:
-      - |
-        if [ -n "$REGISTRY" ] && [ -z "$NAMESPACE" ]; then
-          echo "Error: NAMESPACE variable is not set in .env"
-          exit 1
-        fi
-        if [ "$REGISTRY" = "ghcr" ]; then
-          echo "ghcr.io/$NAMESPACE/openserverless-streamer"
-        elif [ "$REGISTRY" = "dockerhub" ]; then
-          echo "docker.io/$NAMESPACE/openserverless-streamer"
-        elif [ "$REGISTRY" = "apache" ]; then
-          echo "registry.hub.docker.com/apache/openserverless-streamer"
-        else
-          echo "openserverless-streamer"
-        fi
+        IMG="${MY_STREAMER_IMAGE:-{{.STREAMER_IMAGE}}}"
+        case "$IMG" in
+          ghcr.io/*) task docker-login-ghcr ;;
+          *)         task docker-login-dockerhub ;;
+        esac
 
-  image-tag:
-    silent: true
+  image:
     desc: |
-      Create a new tag for the current git commit.      
+      Print the image name that would be built.
+    silent: true
     cmds:
-      - git tag -d $(git tag)
-      - git tag -f {{.BASETAG}}.$(date +%y%m%d%H%M)
-      - env PAGER= git tag
-      
+      - echo "Streamer=${MY_STREAMER_IMAGE:-{{.STREAMER_IMAGE}}}:{{.TAG}}"
+
+  # deprecated - use task tag
+  image-tag:
+    desc: "[deprecated] use task tag"
+    silent: true
+    cmds:
+      - 'echo "deprecated, use task tag"'
+
+  tag:
+    desc: |
+      Create a new snapshot tag for the current git commit.
+      NOTE: this deletes the existing local tags first - snapshot tags are disposable.
+    silent: true
+    vars:
+      TS:
+        sh: date '+%y %m %d %H %M' | awk '{printf "%s%s%02d%s%02d\n", $1, substr("abcdefghijkl",$2+0,1), $3, substr("abcdefghijklmnopqrstuvwx",$4+1,1), $5}'
+    cmds:
+      - git tag -d $(git tag) 2>/dev/null || true
+      - |
+        TAG="{{.BASETAG}}.{{.TS}}{{.SUFFIX}}"
+        git tag -f $TAG
+        echo New tag $TAG
+
+  ci:
+    desc: |
+      Push the tags, starting the GitHub Actions build on the repo that received them.
+      This does not build anything locally.
+    cmds:
+      - git push --tags
+
   buildx:
     desc: |
       Build the docker image using buildx. Set PUSH=1 to push the image to the registry.
     silent: true
     cmds:
       - |
-        BASEIMG=$(task base-image-name)
-        IMG="$BASEIMG:{{.TAG}}"
+        IMG="${MY_STREAMER_IMAGE:-{{.STREAMER_IMAGE}}}:{{.TAG}}"
         if [ -n "{{.PUSH}}" ]; then
-          if [ -z "$REGISTRY" ]; then
-            echo "Error: REGISTRY variable must be set in .env to push the image"
-            exit 1
-          fi
-          {{.DRY}} docker buildx build -t $IMG --platform linux/amd64,linux/arm64 . --push
+          {{.DRY}} docker buildx build -t "$IMG" \
+            --build-arg STREAMER_IMAGE_DEFAULT="${MY_STREAMER_IMAGE:-{{.STREAMER_IMAGE}}}" \
+            --build-arg STREAMER_TAG_DEFAULT="{{.TAG}}" \
+            --platform linux/amd64,linux/arm64 . --push
         else
-          {{.DRY}} docker buildx build -t $IMG . --load
+          {{.DRY}} docker buildx build -t "$IMG" \
+            --build-arg STREAMER_IMAGE_DEFAULT="${MY_STREAMER_IMAGE:-{{.STREAMER_IMAGE}}}" \
+            --build-arg STREAMER_TAG_DEFAULT="{{.TAG}}" \
+            . --load
         fi
+        echo "Built $IMG"
 
   test:
     desc: |
@@ -109,8 +125,14 @@ tasks:
         cd src
         go test -v ./...
         cd ../
-  
+
   build:
+    desc: |
+      Build the docker image locally and load it into the local docker daemon.
+    cmds:
+      - task: buildx
+
+  build-binary:
     desc: |
       Build the streamer binary locally. This will create a binary named streamer in the current directory.
     silent: true
@@ -119,7 +141,7 @@ tasks:
         rm -f streamer
         cd src
         echo "Building streamer binary..."
-        if test -n "{{.OPTIMIZE}}" 
+        if test -n "{{.OPTIMIZE}}"
         then {{.DRY}} CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o ../streamer
         else {{.DRY}} go build -o ../streamer
         fi
@@ -130,11 +152,11 @@ tasks:
           exit 1
         fi
         cd ../
-  
+
   clean:
     desc: |
       Clean up the build artifacts. This will remove the streamer binary and clean the go cache.
-    cmds:  
+    cmds:
     - |
       rm -f streamer || true
       cd src
@@ -146,6 +168,6 @@ tasks:
     desc: |
       Run the streamer binary locally, using configuration from .env file
     cmds:
-      - task: build
+      - task: build-binary
       - ./streamer
 
