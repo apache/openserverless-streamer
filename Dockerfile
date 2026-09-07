@@ -14,8 +14,8 @@
 # limitations under the License.
 #
 
-# Do not fix the patch level for golang:1.23 to automatically get security fixes.
-FROM golang:1.23-alpine AS builder
+# Do not fix the patch level for golang:1.25 to automatically get security fixes.
+FROM golang:1.25-alpine AS builder
 WORKDIR /src
 COPY src/ .
 ENV CGO_ENABLED=0 GOOS=linux
