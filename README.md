@@ -63,5 +63,5 @@ action on the given namespace, custom package, and action name.
 
 ## Building
 
-Check the [BUILD.md](https://github.com/apache/openserverless/blob/main/BUILD.md)
+Check the [DEVEL.md](https://github.com/apache/openserverless/blob/main/DEVEL.md)
 in the [apache/openserverless](https://github.com/apache/openserverless) repository.
