@@ -26,7 +26,7 @@ ARG STREAMER_IMAGE_DEFAULT=docker.io/apache/openserverless-streamer
 ARG STREAMER_TAG_DEFAULT=latest
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ 
 COPY --from=builder /src/streamer /streamer
-# Apache release metadata (see DISCLAIMER, LICENSE, NOTICE, WARN)
+# Apache release metadata (see DISCLAIMER, LICENSE, NOTICE)
 COPY DISCLAIMER LICENSE NOTICE /
 
 ENTRYPOINT ["/streamer"]
