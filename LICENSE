@@ -202,139 +202,229 @@
    limitations under the License.
 
 
-========================================================================
-Apache License 2.0
-========================================================================
+---------------
 
-This distribution bundles the following components, which are available under an Apache License 2.0 (https://opensource.org/licenses/Apache-2.0).
-Spray Caching 1.3.4 (io.spray:spray-caching_2.11:1.3.4 - http://spray.io/documentation/1.2.4/spray-caching/)
-  ConcurrentMapBackedCache.scala under common/scala/src/main/scala/org/apache/openwhisk/core/database/ contains implementation
-  from Spray's [[spray.caching.Cache]] and [[spray.caching.SimpleLruCache]] respectively.
-  License included at licenses/LICENSE-spray.txt, or https://github.com/spray/spray/blob/master/LICENSE
-  Copyright (C) 2011-2015 the spray project <http://spray.io>
+The Apache OpenServerless Streamer source distribution is licensed under the
+Apache License, Version 2.0, reproduced above.
 
-This product bundles the files gradlew and gradlew.bat from Gradle v5.5
-which are distributed under the Apache License, Version 2.0.
-For details see ./gradlew and ./gradlew.bat.
+The container image built from the Dockerfile in this distribution is a
+convenience binary. It statically links the Go module dependencies declared
+in `src/go.mod` and `src/go.sum`, and copies a CA certificate bundle from the
+builder stage. The components below are bundled in that image under the
+licenses recorded in this file. Components that are not compatible with the
+Apache License, Version 2.0 are enumerated in the WARN file beside this one.
 
+---------------
 
-==============================================================================
-BEGIN BUNDLED THIRD-PARTY SOFTWARE INVENTORY (container image)
-==============================================================================
+The streamer binary contains code from the following Go modules which were
+released under the Apache License, Version 2.0.
 
-==============================================================================
-LICENSES OF BUNDLED THIRD-PARTY SOFTWARE
-Container image: apache/openserverless-streamer
-==============================================================================
+- github.com/apache/openwhisk-client-go (v0.0.0-20241028140229-bb8408824b9b)
 
-Apache OpenServerless itself is licensed under the Apache License,
-Version 2.0, reproduced above. The container image built from the
-Dockerfile beside this file additionally bundles the third-party
-components listed below, each under its own license.
+  Apache OpenWhisk
+  Copyright 2016-2024 The Apache Software Foundation
 
-Refer to https://www.apache.org/legal/resolved.html for the ASF
-classification of these licenses. Components that are NOT compatible
-with the Apache License 2.0 are enumerated in the WARN file.
+- github.com/cloudfoundry/jibber_jabber (v0.0.0-20151120183258-bcc4c8345a21)
 
-------------------------------------------------------------------------------
-Summary by license
-------------------------------------------------------------------------------
+  Copyright (c) 2014 Pivotal
 
-Apache-2.0
-    github.com/apache/openwhisk-client-go (v0.0.0-20241028140229-bb8408824b9b)
-    github.com/cloudfoundry/jibber_jabber (v0.0.0-20151120183258-bcc4c8345a21)
-    github.com/pelletier/go-toml (v1.9.5)
+- github.com/pelletier/go-toml (v1.9.5)
 
-Apache-2.0 AND MIT
-    gopkg.in/yaml.v2 (v2.4.0)
-    gopkg.in/yaml.v3 (v3.0.1)
+  Copyright (c) 2013 - 2021 Thomas Pelletier, Eric Anderton
 
-BSD-2-Clause
-    gopkg.in/check.v1 (v0.0.0-20161208181325-20d25e280405)
+---------------
 
-BSD-3-Clause
-    github.com/fsnotify/fsnotify (v1.6.0)
-    github.com/google/go-cmp (v0.5.2)
-    github.com/google/go-querystring (v1.1.0)
-    github.com/pmezard/go-difflib (v1.0.1-0.20181226105442-5d4384ee4fb2)
-    golang.org/x/net (v0.38.0)
-    golang.org/x/sys (v0.31.0)
-    golang.org/x/text (v0.23.0)
-    gopkg.in/tomb.v1 (v1.0.0-20141024135613-dd632973f1e7)
+The streamer binary contains code from gopkg.in/yaml.v2 (v2.4.0) and
+gopkg.in/yaml.v3 (v3.0.1), which were released under the Apache License,
+Version 2.0 and, for the parts derived from libyaml, under the MIT license.
 
-ISC
-    github.com/davecgh/go-spew (v1.1.2-0.20180830191138-d8f796af33cc)
+Copyright 2011-2016 Canonical Ltd.
+Copyright (c) 2006-2010 Kirill Simonov
+Copyright (c) 2006-2011 Kirill Simonov
 
-MIT
-    github.com/fatih/color (v1.17.0)
-    github.com/hokaccha/go-prettyjson (v0.0.0-20211117102719-0474bc63780f)
-    github.com/mattn/go-colorable (v0.1.13)
-    github.com/mattn/go-isatty (v0.0.20)
-    github.com/nicksnyder/go-i18n (v1.10.3)
-    github.com/nxadm/tail (v1.4.11)
-    github.com/onsi/ginkgo (v1.15.0)
-    github.com/onsi/gomega (v1.10.5)
-    github.com/stretchr/testify (v1.9.0)
+The MIT license text is reproduced below under "MIT License".
 
-MPL-2.0
-    CA certificates bundle ((Alpine ca-certificates))
+---------------
 
-------------------------------------------------------------------------------
-Detail by component
-------------------------------------------------------------------------------
+The streamer binary contains code from the following Go modules which were
+released under the 3-clause BSD license.
 
-Go module dependencies (src/go.mod, src/go.sum)
------------------------------------------------
-  github.com/apache/openwhisk-client-go (v0.0.0-20241028140229-bb8408824b9b) -- Apache-2.0
-      Apache OpenWhisk.
-  github.com/stretchr/testify (v1.9.0) -- MIT
-      Test-only dependency.
-  github.com/cloudfoundry/jibber_jabber (v0.0.0-20151120183258-bcc4c8345a21) -- Apache-2.0
-  github.com/davecgh/go-spew (v1.1.2-0.20180830191138-d8f796af33cc) -- ISC
-  github.com/fatih/color (v1.17.0) -- MIT
-  github.com/google/go-querystring (v1.1.0) -- BSD-3-Clause
-  github.com/hokaccha/go-prettyjson (v0.0.0-20211117102719-0474bc63780f) -- MIT
-  github.com/mattn/go-colorable (v0.1.13) -- MIT
-  github.com/mattn/go-isatty (v0.0.20) -- MIT
-  github.com/nicksnyder/go-i18n (v1.10.3) -- MIT
-  github.com/nxadm/tail (v1.4.11) -- MIT
-  github.com/pelletier/go-toml (v1.9.5) -- Apache-2.0
-  github.com/pmezard/go-difflib (v1.0.1-0.20181226105442-5d4384ee4fb2) -- BSD-3-Clause
-  golang.org/x/net (v0.38.0) -- BSD-3-Clause
-  golang.org/x/sys (v0.31.0) -- BSD-3-Clause
-  golang.org/x/text (v0.23.0) -- BSD-3-Clause
-  gopkg.in/yaml.v2 (v2.4.0) -- Apache-2.0 AND MIT
-  gopkg.in/yaml.v3 (v3.0.1) -- Apache-2.0 AND MIT
-  github.com/onsi/ginkgo (v1.15.0) -- MIT
-      Test-only, transitive.
-  github.com/onsi/gomega (v1.10.5) -- MIT
-      Test-only, transitive.
-  github.com/fsnotify/fsnotify (v1.6.0) -- BSD-3-Clause
-      Transitive.
-  github.com/google/go-cmp (v0.5.2) -- BSD-3-Clause
-      Test-only, transitive.
-  gopkg.in/check.v1 (v0.0.0-20161208181325-20d25e280405) -- BSD-2-Clause
-      Test-only, transitive.
-  gopkg.in/tomb.v1 (v1.0.0-20141024135613-dd632973f1e7) -- BSD-3-Clause
-      Transitive.
-  CA certificates bundle ((Alpine ca-certificates)) -- MPL-2.0
-      Category B: copied unmodified from the builder stage.
+- github.com/google/go-querystring (v1.1.0)
 
-------------------------------------------------------------------------------
-Full license texts
-------------------------------------------------------------------------------
+  Copyright (c) 2013 Google. All rights reserved.
 
-The complete text of the Apache License 2.0 is reproduced at the top of
-this file. The complete texts of the other licenses referenced above are
-distributed with each component inside the container image, in the
-package metadata directories of the respective package manager:
+- github.com/pmezard/go-difflib (v1.0.1-0.20181226105442-5d4384ee4fb2)
 
-  * Python packages: <site-packages>/<dist>.dist-info/ (LICENSE, METADATA)
-  * Node.js packages: /node_modules/<pkg>/LICENSE
-  * PHP packages:     /phpAction/composer/vendor/<pkg>/LICENSE
-  * Go modules:       vendored module sources / pkg.go.dev
-  * Debian packages:  /usr/share/doc/<pkg>/copyright
+  Copyright (c) 2013, Patrick Mezard. All rights reserved.
 
-==============================================================================
-END BUNDLED THIRD-PARTY SOFTWARE INVENTORY
-==============================================================================
+- golang.org/x/crypto (v0.51.0)
+- golang.org/x/net (v0.55.0)
+- golang.org/x/sys (v0.45.0)
+- golang.org/x/term (v0.43.0)
+- golang.org/x/text (v0.37.0)
+- golang.org/x/xerrors (v0.0.0-20191204190536-9bdfabe68543)
+
+  Copyright (c) 2009 The Go Authors. All rights reserved.
+
+- github.com/fsnotify/fsnotify (v1.6.0)
+
+  Copyright (c) 2012 The Go Authors. All rights reserved.
+  Copyright (c) 2012-2019 fsnotify Authors. All rights reserved.
+
+- github.com/google/go-cmp (v0.5.2)
+
+  Copyright (c) 2017 The Go Authors. All rights reserved.
+
+- gopkg.in/tomb.v1 (v1.0.0-20141024135613-dd632973f1e7)
+
+  Copyright (c) 2010-2011 - Gustavo Niemeyer <gustavo@niemeyer.net>
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+   * Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+   * Redistributions in binary form must reproduce the above
+copyright notice, this list of conditions and the following disclaimer
+in the documentation and/or other materials provided with the
+distribution.
+   * Neither the name of the copyright holder nor the names of its
+contributors may be used to endorse or promote products derived from
+this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+---------------
+
+The streamer test binaries contain code from gopkg.in/check.v1
+(v0.0.0-20161208181325-20d25e280405) which was released under the 2-clause
+BSD license.
+
+Copyright (c) 2010-2013 Gustavo Niemeyer <gustavo@niemeyer.net>
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice, this
+   list of conditions and the following disclaimer.
+2. Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+---------------
+
+The streamer binary contains code from the following Go modules which were
+released under the MIT license.
+
+- github.com/fatih/color (v1.17.0)
+
+  Copyright (c) 2013 Fatih Arslan
+
+- github.com/hokaccha/go-prettyjson (v0.0.0-20211117102719-0474bc63780f)
+
+  Copyright (c) 2015 Kazuhiro Hokamura
+
+- github.com/mattn/go-colorable (v0.1.13)
+- github.com/mattn/go-isatty (v0.0.20)
+
+  Copyright (c) 2016 Yasuhiro Matsumoto
+
+- github.com/nicksnyder/go-i18n (v1.10.3)
+
+  Copyright (c) 2014 Nick Snyder https://github.com/nicksnyder
+
+- github.com/nxadm/tail (v1.4.11)
+
+  Copyright (c) 2019 FOSS contributors of https://github.com/nxadm/tail
+  Copyright (c) 2015 HPE Software Inc. All rights reserved.
+  Copyright (c) 2013 ActiveState Software Inc. All rights reserved.
+
+- github.com/stretchr/testify (v1.9.0)
+- github.com/stretchr/objx (v0.5.2)
+
+  Copyright (c) 2012-2020 Mat Ryer, Tyler Bunnell and contributors.
+
+- github.com/onsi/ginkgo (v1.15.0)
+
+  Copyright (c) 2013-2014 Onsi Fakhouri
+
+- github.com/onsi/gomega (v1.10.5)
+
+  Copyright (c) 2013-2014 Onsi Fakhouri
+
+                                MIT License
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+---------------
+
+The streamer binary contains code from github.com/davecgh/go-spew
+(v1.1.2-0.20180830191138-d8f796af33cc) which was released under the ISC
+license.
+
+Copyright (c) 2012-2016 Dave Collins <dave@davec.name>
+
+Permission to use, copy, modify, and distribute this software for any
+purpose with or without fee is hereby granted, provided that the above
+copyright notice and this permission notice appear in all copies.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
+---------------
+
+The container image contains a CA certificate bundle copied unmodified from
+the Alpine `ca-certificates` package of the builder stage. The bundle is
+derived from the Mozilla CA Certificate Store, which is released under the
+Mozilla Public License, Version 2.0.
+
+This is a Category B component under the ASF third-party licensing policy
+(https://www.apache.org/legal/resolved.html): it is included in binary form
+only, unmodified, and as a separate file. See the WARN file.
+
+The complete text of the Mozilla Public License, Version 2.0 is available at
+<https://www.mozilla.org/MPL/2.0/>.
