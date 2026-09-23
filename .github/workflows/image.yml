@@ -23,7 +23,7 @@ on:
     tags:
     - '*.*.*.*'
     branches-ignore:
-    - '*'
+    - '**'
   workflow_dispatch:
 jobs:
   image:
@@ -33,10 +33,6 @@ jobs:
       contents: write
       packages: write
     steps:
-      - name: Remove unnecessary files
-        run: |
-          sudo rm -rf /usr/share/dotnet
-          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
       - name: Checkout
         uses: actions/checkout@v7
         with:
@@ -65,7 +61,7 @@ jobs:
       - name: Assign TAG from push
         if:  ${{ github.event_name != 'pull_request' }}
         run: |
-          echo "IMG_TAG=$(git describe --tags --abbrev=0)" >> "$GITHUB_ENV"
+          echo "IMG_TAG=${{ github.ref_name }}" >> "$GITHUB_ENV"
       - name: Generate .env
         run: |
           OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
